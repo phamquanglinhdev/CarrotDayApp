@@ -9,8 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-from Content import Ui_Content
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox
+import os
+from Database import DataUserToken
+from Main import Ui_MainWindow
+from Course import Ui_Course
 
 
 class Ui_Login(object):
@@ -65,7 +69,7 @@ class Ui_Login(object):
         self.passwordInput.setText("")
         self.passwordInput.setEchoMode(QtWidgets.QLineEdit.Password)
         self.passwordInput.setObjectName("passwordInput")
-        self.loginBtn = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.checkLogin())
+        self.loginBtn = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.openVideo())
         self.loginBtn.setEnabled(True)
         self.loginBtn.setGeometry(QtCore.QRect(80, 200, 161, 41))
         font = QtGui.QFont()
@@ -97,18 +101,33 @@ class Ui_Login(object):
 
     def retranslateUi(self, Login):
         _translate = QtCore.QCoreApplication.translate
-        Login.setWindowTitle(_translate("Login", "MainWindow"))
+        Login.setWindowTitle(_translate("Login", "Đăng nhập"))
+        Login.setWindowIcon(QIcon("favicon.png"))
         self.label.setText(_translate("Login", "CarrotDay"))
         self.usernameInput.setPlaceholderText(_translate("Login", "Username"))
         self.passwordInput.setPlaceholderText(_translate("Login", "Password"))
         self.loginBtn.setText(_translate("Login", "Đăng nhập nào !"))
 
-    def checkLogin(self):
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_Content()
-        self.ui.setupUi(self.window)
-        self.window.show()
-        Login.hide()
+    def openVideo(self):
+        self.loginBtn.setText("Waiting...")
+        user = DataUserToken(self.usernameInput.text(), self.passwordInput.text())
+        result = user.result
+        if result["code"] == 404:
+            self.showDialog("Sai thông tin đăng nhập")
+        else:
+            self.window = QtWidgets.QMainWindow()
+            self.ui = Ui_MainWindow()
+            self.ui.setupUi(self.window, Login, result["token"])
+            self.window.show()
+
+    def showDialog(self, content):
+        msgBox = QMessageBox()
+        msgBox.setWindowIcon(QIcon("favicon.png"))
+        msgBox.setText(content)
+        msgBox.setWindowTitle("Lỗi")
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.exec()
+        self.loginBtn.setText("Đăng nhập nào !!")
 
 
 if __name__ == "__main__":

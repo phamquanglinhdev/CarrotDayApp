@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>D:/Python/CarrotDayApp/banner-khoahocnuoinick.jpg</file>
+    <file>C:/Users/Phaml/Desktop/Capture.PNG</file>
+    <file>favicon.png</file>
+  </qresource>
+  <qresource prefix="newPrefix"/>
+</RCC>
