@@ -15,6 +15,10 @@ import os
 from Database import DataUserToken
 from Main import Ui_MainWindow
 from Course import Ui_Course
+from loading import Loading
+from remember import LocaL
+
+opens = True
 
 
 class Ui_Login(object):
@@ -97,7 +101,9 @@ class Ui_Login(object):
         Login.setStatusBar(self.statusbar)
 
         self.retranslateUi(Login)
+
         QtCore.QMetaObject.connectSlotsByName(Login)
+        # self.openMainUsingToken()
 
     def retranslateUi(self, Login):
         _translate = QtCore.QCoreApplication.translate
@@ -108,16 +114,28 @@ class Ui_Login(object):
         self.passwordInput.setPlaceholderText(_translate("Login", "Password"))
         self.loginBtn.setText(_translate("Login", "Đăng nhập nào !"))
 
+    def openMainUsingToken(self):
+        remember = LocaL().checkToken()
+        if remember["code"] == 200:
+            self.window = QtWidgets.QMainWindow()
+            self.ui = Ui_MainWindow()
+            self.ui.setupUi(self.window, Login, load, remember["token"])
+            self.window.show()
+            return True
+
     def openVideo(self):
         self.loginBtn.setText("Waiting...")
         user = DataUserToken(self.usernameInput.text(), self.passwordInput.text())
+        self.loginBtn.setText("Đăng nhập nào !!")
         result = user.result
         if result["code"] == 404:
             self.showDialog("Sai thông tin đăng nhập")
         else:
+            saving = LocaL().setToken(result["token"])
             self.window = QtWidgets.QMainWindow()
+            load.loadbox.show()
             self.ui = Ui_MainWindow()
-            self.ui.setupUi(self.window, Login, result["token"])
+            self.ui.setupUi(self.window, Login, load, result["token"])
             self.window.show()
 
     def showDialog(self, content):
@@ -135,7 +153,11 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     Login = QtWidgets.QMainWindow()
+    load = Loading()
+    load.loadbox.show()
     ui = Ui_Login()
     ui.setupUi(Login)
-    Login.show()
+    if not ui.openMainUsingToken():
+        Login.show()
+        load.loadbox.hide()
     sys.exit(app.exec_())

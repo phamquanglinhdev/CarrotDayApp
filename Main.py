@@ -9,23 +9,34 @@
 import requests
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QImage
+from PyQt5.QtWidgets import QMessageBox
+
 from Database import User
 from Course import Ui_Course
+from remember import LocaL
 
 
 class Ui_MainWindow(object):
-    def openCourseWindow(self,MainWindow):
+    def openCourseWindow(self, MainWindow):
+        self.Loading.loadbox.show()
         self.window = QtWidgets.QWidget()
         self.ui = Ui_Course()
-        self.ui.setupUi(self.window, MainWindow)
+        self.ui.setupUi(self.window, MainWindow, self.Loading, "Python")
+        self.Loading.loadbox.hide()
         self.window.show()
 
     def backToLogin(self, MainWindow, LoginWindow):
+        self.Loading.loadbox.show()
+        LocaL().destroyToken()
         MainWindow.hide()
+        self.Loading.loadbox.hide()
         LoginWindow.show()
 
-    def setupUi(self, MainWindow, LoginWindow, token="jzhzgxRG2zmCJAsMATSwd1Al6"):
-        LoginWindow.hide()
+    def setupUi(self, MainWindow, LoginWindow, LoadWindow, token="jzhzgxRG2zmCJAsMATSwd1Al6"):
+        self.LoginWindow = LoginWindow
+        self.LoginWindow.hide()
+        self.Loading = LoadWindow
+        self.Loading.loadbox.hide()
         self.token = token
         self.user = User(token).result
         if (self.user["code"] == 404):

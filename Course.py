@@ -10,20 +10,26 @@ import time
 from PyQt5.QtCore import *
 
 
+
+
 class Ui_Course(QWidget):
-    def setupUi(self, Course,MainWindow):
+    def setupUi(self, Course,MainWindow,Loading,Category):
+        self.Loading = Loading
+        self.category = Category
+        # self.Loading.loadbox.hide()
+        self.Course = Course
         # self.centerScreen()
         # Course.setMaximumSize(QSize(1140, 400))
         Course.setObjectName("Course")
-        Course.setStyleSheet("background:black")
-        Course.setFixedWidth(399*3)
-        Course.setFixedHeight(900)
-        Course.setWindowFlags(Qt.WindowCloseButtonHint)
+        # Course.setStyleSheet("background:black")
+        Course.setMinimumSize(QSize(1280, 600))
+        # Course.setFixedWidth(399*3)
+        # Course.setFixedHeight(900)
         self.container = QVBoxLayout(Course)
         self.content = QGridLayout()
         self.box = QGroupBox()
         self.box.setLayout(self.content)
-        self.box.setStyleSheet("background:black")
+        # self.box.setStyleSheet("background:black")
         self.container.setObjectName("verticalLayout")
         self.refresh = QPushButton("Làm mới", clicked=lambda: self.refreshApp())
         self.refresh.setStyleSheet("background:#FFB6C1;color:white;font:12pt bold;border:none;padding:4")
@@ -40,7 +46,7 @@ class Ui_Course(QWidget):
         # self.setLayout(self.container)
         self.grixX = 1
         self.grixY = 1
-        datas = DataVideo().videos
+        datas = DataVideo(self.category).videos
         for video in datas:
             self.createBox(video)
             # print(video)
@@ -59,8 +65,8 @@ class Ui_Course(QWidget):
         # btn.setText("    " + video["name"])
         btn.setFixedSize(333, 200)
         btn.setStyleSheet("font: 18pt \"VL Selphia\";\n"
-                          "color: black;\n"
-                          # "background-color: rgb(255, 255, 255);\n"
+                          # "color: black;\n"
+                          "background-color: none;\n"
                           "text-align:left;\n"
                           # "border:none\n"
                           "")
@@ -70,20 +76,25 @@ class Ui_Course(QWidget):
         btn.setToolTip(video["name"])
         btn.setToolTipDuration(0)
         label = QLabel(video["name"])
-        label.setFixedSize(333, 20)
+        label.setFixedHeight(20)
+        label.setAlignment(Qt.AlignCenter)
         label.setStyleSheet("font: 12pt \"VL Selphia\";\n"
-                            "color: white;\n"
+                            # "color: white;\n"
+                            "text-align: center;\n"
                             # "background-color: rgb(255, 255, 255);\n"
                             "text-align:left;\n"
                             # "border:none\n"
                             "")
         box = QGroupBox()
         layout = QGridLayout()
-        box.setFixedSize(360, 300)
-        box.setStyleSheet("background:black")
+
+        # box.setFixedHeight(300)
+        # box.setStyleSheet("background:black")
         layout.addWidget(btn)
         layout.addWidget(label)
+        box.setStyleSheet("border:none;background:#FFB6C1")
         box.setLayout(layout)
+
         self.content.addWidget(box, self.grixX, self.grixY)
         self.grixY += 1
         if self.grixY > 3:
@@ -115,14 +126,15 @@ class Ui_Course(QWidget):
     def refreshApp(self):
         self.grixX = 1
         self.grixY = 1
+        self.Course.hide()
+        self.Loading.loadbox.show()
         datas = DataVideo().videos
         for video in datas:
             self.createBox(video)
-        self.msgBox = QMessageBox()
-        self.msgBox.setIcon(QMessageBox.Information)
-        self.msgBox.setText("Đã cập nhật lại")
-        self.msgBox.setWindowTitle("Thành công")
-        self.msgBox.show()
+        self.Course.show()
+        self.Loading.loadbox.hide()
+
+
 
     def centerScreen(self):
         width = app.primaryScreen().size().width()
@@ -156,4 +168,5 @@ if __name__ == "__main__":
     ui = Ui_Course()
     ui.setupUi(Course)
     Course.show()
+
     sys.exit(app.exec_())

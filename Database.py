@@ -2,11 +2,15 @@ import requests
 
 
 class DataVideo:
-    def __init__(self):
-        self.videos = self.getCategories()
+    def __init__(self, category):
+        self.videos = self.getCategories(category)
 
-    def getCategories(self):
-        response = requests.get("https://dl-devs.com/api/video/")
+    def getCategories(self, category):
+        header = {
+            "name": category
+        }
+        response = requests.post("https://dl-devs.com/api/video/", data=header)
+        print(response)
         return response.json()
 
 
@@ -42,3 +46,5 @@ class User:
 
 # user = User("jzhzgxRG2zmCJAsMATSwd1Al6")
 # print(user.result)
+video = DataVideo("Python").videos
+print(video)
